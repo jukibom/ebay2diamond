@@ -327,7 +327,7 @@
 
 		$file = new \SplFileObject($outputFile, 'w');
 
-		$header = encodeCsvLine($headerList);
+		$header = implode(',', $headerList) . "\r\n";
 
 		// Dirty hack, switch out mysterious 'Total2' field for 'Total'. Again. Ugh.
 		$header = str_replace('Total2', 'Total', $header);
@@ -476,7 +476,7 @@
 
 		return implode(
 			',', array_map($quote, $csvLine)
-		) . PHP_EOL;
+		) . "\r\n";
 	}
 
 
