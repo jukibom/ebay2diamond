@@ -476,7 +476,7 @@
 
 		return implode(
 			',', array_map($quote, $csvLine)
-		) . PHP_EOL;
+		) . "\r\n";
 	}
 
 
