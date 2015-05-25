@@ -183,7 +183,6 @@
 					} else {
 						// restore original references (different in CSV to sales page!)
 						$orderNo--;
-
 						$order['name']			= $headerRow['name'];
 						$order['address1']		= $headerRow['address1'];
 						$order['address2']		= $headerRow['address2'];
@@ -272,17 +271,23 @@
 
 			$diamondArray[$key] = $order;
 
+			// company (always residential for now)
+			$diamondArray[$key]['company'] = "PRIVATE ADDRESS";
+
 			// contents (currently static)
 			$diamondArray[$key]['contents'] = $contents;
 
 			// weight (user-specified or default to 0.5)
 			if ($specifyWeight) {
 				echo 'Please enter weight (Kg) for eBay order ' . $order['reference'] . ' (' . $order['name'] . '):  ';
-				$diamondArray[$key]['weight'] = getUserWeight();
+				$diamondArray[$key]['total_weight'] = getUserWeight();
 			} else {
 				echo 'Default to ' . $defaultWeight . 'Kg (' . $order['name'] . '):  ';
-				$diamondArray[$key]['weight'] = $defaultWeight;
+				$diamondArray[$key]['total_weight'] = $defaultWeight;
 			}
+
+			// 'pieces' (always 1)
+			$diamondArray[$key]['total_pieces'] = 1;
 
 			complete();
 		}
@@ -311,18 +316,14 @@
 			'address3'				=> 'Address3',
 			'address4'				=> 'City',
 			'postcode'				=> 'Postcode',
-			'phone'					=> 'Phone',
-			'number'				=> 'Number',
+			'phone'					=> 'Phone Number',
 			'email'					=> 'email',
 			'reference'				=> 'Reference1',
 			'contents'				=> 'Reference2',
 			'delivery_instructions'	=> 'Instruction/Description',
-			// there's actually a 'Total' field here and I don't know what it refers to.
-			'mysterious_total' 		=> 'Total',
-			'pieces'				=> 'Pieces',
-			// and another one here... due to duplicate array keys, this is str replaced as 'Total' below.
-			'mysterious_total_2'	=> 'Total2',
-			'weight'				=> 'Weight',
+			'total_pieces'	 		=> 'Total Pieces',
+			// Total2 MUST be called Total - but we use that already so we hack that out below. Yay!
+			'total_weight'			=> 'Total Weight',
 		);
 
 		$file = new \SplFileObject($outputFile, 'w');
@@ -500,8 +501,6 @@
 	/**
 	 * Get user input for weight of an order
 	 *
-	 * Reduces the weight by 0.01% in order to drop below threshold for parcel weights
-	 *
 	 * Maximum weight input of 31Kg
 	 *
 	 * @return float weight value
@@ -534,7 +533,7 @@
 					break;
 
 				default:
-					$weight = $line * 0.99;	// By default reduce slightly to drop below parcel cost threshold (10Kg = 9.9 Kg = 5-10Kg parcel)
+					$weight = $line;
 					break;
 			}
 		}
